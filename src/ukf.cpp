@@ -107,11 +107,17 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
         if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
             double rho = meas_package.raw_measurements_[0];
             double phi = meas_package.raw_measurements_[1];
-            double v = meas_package.raw_measurements_[2];
+            double rhor = meas_package.raw_measurements_[2];
             double px = rho * cos(phi);
             double py = rho * sin(phi);
+            double phir = 0.0;
+            // Following is only true if phir = 0.0. This is a reasonable assumption during initialization
+            // Note that yaw is not yet known.
+            double vx = rhor * cos(phi);
+            double vy = rhor * sin(phi);
             double yawd = 0.0;
-            x_ << px, py, v, phi, yawd;
+
+            x_ << px, py, sqrt(vx * vx + vy * vy), atan2(vy, vx), yawd;
         } else if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
             double px = meas_package.raw_measurements_[0];
             double py = meas_package.raw_measurements_[1];
