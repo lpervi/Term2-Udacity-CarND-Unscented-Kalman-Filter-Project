@@ -43,6 +43,10 @@ UKF::UKF() {
     // Radar measurement noise standard deviation radius change in m/s
     std_radrd_ = 0.3;
 
+
+    // if this is false, the UKF needs to be initialized (first step)
+    is_initialized_ = false;
+
     // State dimension
     n_x_ = 5;
 
