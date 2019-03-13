@@ -1,35 +1,68 @@
 [image1]: ./outputs/1.png "1"
-[image2]: ./outputs/2.png "2"
-[image3]: ./outputs/3.png "3"
-[image4]: ./outputs/4.png "4"
 
-# Unscented Kalman Filter Project
-Self-Driving Car Engineer Nanodegree Program
 
-The README for project starter code in order to do the code setup is at this [Udacity link.](https://github.com/udacity/CarND-Unscented-Kalman-Filter-Project)
+# The Real Unscented Kalman Filter
 
-##Brief on Project.
-In this project, we will utilize a Kalman filter to estimate the state of a moving object of interest with noisy lidar and radar measurements. It is expected to keep the RMSE (error) values, **[px, py, vx, and vy]** less than or equal to the values **[.09, .10, .40, .30]**.
+This exercise is intended to show the improved robustness of the Real Unscented Kalman filter. This filter is a slight modification of the UKF, requiring no additional computations at all, that makes the filter abosrve second order terms, so improve performances. Proof can be found in [_Perea et al_](https://arc.aiaa.org/doi/10.2514/1.36824)
 
-This project uses the Term 2 Simulator which can be downloaded [here.](https://github.com/udacity/self-driving-car-sim/releases)
+As a representative example, I've taken an already existing C++ program from the Udacity study program: ["Self-Driving Car Engineer Nanodegree Program"](https://eu.udacity.com/course/self-driving-car-engineer-nanodegree--nd013). This is intended to determine the position of a vehicle based on laser and radar measurements using the UKF, as described in [this tutorial](https://www.cse.sc.edu/~terejanu/files/tutorialUKF.pdf).
 
-This repository includes two files that can be used to set up and install [uWebSocketIO](https://github.com/uWebSockets/uWebSockets) for either Linux or Mac systems. For windows you can use either Docker, VMware, or even [Windows 10 Bash on Ubuntu](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/) to install uWebSocketIO. Please see [this concept in the classroom](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/16cf4a78-4fc7-49e1-8621-3450ca938b77) for the required version and installation scripts.
+My goal is to use this code to show the benefits of the modified UKF. In general, both filters perform similarly, but some ill-conditioned problems may cause the UKF to diverge while the new filter may still provide good performances.
 
+
+## Problem formulation
+For further details on the definition of the state vector, measurements used, noise levels, etc, please check [this]:(https://medium.com/p/155adb7d71a1)
+
+
+## History of the repository
+Udacity proposed this program to their students and provided the main structure of the files [here](https://github.com/udacity/CarND-Unscented-Kalman-Filter-Project). Code gaps were intended to be filled by individual students.
+Among the different students that forked and completed the code, I took the one from [MyCodeBits](https://github.com/MyCodeBits/Term2-Udacity-CarND-Unscented-Kalman-Filter-Project/) quite by chance.
+
+There were few minor errors, but after correcting them, the code properly implemented the UKF. You can check the commits, as you please.
+
+Finally, I had to do a great effort to implement the modified UKF. For this, I had to edit the ukf.cpp file and replace this line of code
+```
+    VectorXd z_diff = z - z_pred;
+```
+by this
+```
+    VectorXd z_diff = z - z_sig.col(0);
+```
+
+I was exhausted after such work ! :stuck_out_tongue_winking_eye:
+
+
+## Installation and execution instructions
+
+### Install uWebSocketIO
+**MAC / Linux**
+This repository includes two files that can be used to set up and install [uWebSocketIO](https://github.com/uWebSockets/uWebSockets) for either Linux or Mac systems. 
+1. chmod a+x install-_os_.sh  # os should be your operative system, i.e. mac or ubuntu
+2. ./install-_os_.sh 
+
+**Windows**
+For windows you can use either Docker, VMware, or even [Windows 10 Bash on Ubuntu](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/) to install uWebSocketIO. Please see [this concept in the classroom](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/16cf4a78-4fc7-49e1-8621-3450ca938b77) for the required version and installation scripts.
+
+### Build and execute
 Once the install for uWebSocketIO is complete, the main program can be built and run by doing the following from the project top directory.
 
 1. mkdir build
 2. cd build
 3. cmake ..
 4. make
-5. ./ExtendedKF
+5. ./UnscentedKF
 
 
-__INPUT:__ values provided by the simulator to the c++ program
+### Generate measurements (in real time)
+This project uses the Term 2 Simulator which automatically generates the measurements in real time. It can be downloaded [here.](https://github.com/udacity/self-driving-car-sim/releases)
+
+
+__Values provided by the Simulator to the C++ program__
 
 ["sensor_measurement"] => the measurement that the simulator observed (either lidar or radar)
 
 
-__OUTPUT:__ values provided by the c++ program to the simulator
+__Values provided by the C++ program to the Simulator__
 
 ["estimate_x"] <= kalman filter estimated position x
 ["estimate_y"] <= kalman filter estimated position y
@@ -38,37 +71,15 @@ __OUTPUT:__ values provided by the c++ program to the simulator
 ["rmse_vx"]
 ["rmse_vy"]
 
----
 
 ## Other Important Dependencies
 
 Refer [Udacity link's](https://github.com/udacity/CarND-Unscented-Kalman-Filter-Project) **Other Important Dependencies** section.
 
-## Basic Build Instructions
-
-After having the dependencies above met :
-
-1. Clone this repo.
-2. Make a build directory: `mkdir build && cd build`
-3. Compile: `cmake .. && make`
-   * On windows, you may need to run: `cmake .. -G "Unix Makefiles" && make`
-4. Run it: `./ExtendedKF `
 
 ## Code Style
 
 [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html) has been used.
 
 
-**Outputs**
-
-*Images*
-
 ![alt text][image1]
-
-![alt text][image2]
-
-![alt text][image3]
-
-![alt text][image4]
-
-The outputs for estimation is in the [output.txt](https://github.com/MyCodeBits/Term2-Udacity-CarND-Unscented-Kalman-Filter-Project/blob/master/outputs/output.txt) file.
