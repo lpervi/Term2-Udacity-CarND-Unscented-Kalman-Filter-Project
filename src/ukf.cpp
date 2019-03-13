@@ -110,9 +110,9 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
             double rhor = meas_package.raw_measurements_[2];
             double px = rho * cos(phi);
             double py = rho * sin(phi);
-            double phir = 0.0;
             // Following is only true if phir = 0.0. This is a reasonable assumption during initialization
             // Note that yaw is not yet known.
+            double phir = 0.0;
             double vx = rhor * cos(phi);
             double vy = rhor * sin(phi);
             double yawd = 0.0;
@@ -130,6 +130,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
     if ((use_radar_ && meas_package.sensor_type_ == meas_package.RADAR) ||
         (use_laser_ && meas_package.sensor_type_ == meas_package.LASER)) {
+        // time is provided in mili-seconds
         double delta_t = (meas_package.timestamp_ - previous_timestamp_) / 1000000.0;
         previous_timestamp_ = meas_package.timestamp_;
 
@@ -275,10 +276,10 @@ void UKF::UpdateMeasurement(MeasurementPackage meas_package) {
         // Read Measurements
         double rho = meas_package.raw_measurements_[0];
         double phi = meas_package.raw_measurements_[1];
-        double v = meas_package.raw_measurements_[2];
+        double rhor = meas_package.raw_measurements_[2];
 
         z = VectorXd(n_z);
-        z << rho, phi, v;
+        z << rho, phi, rhor;
 
         // predict radar measurement
         z_sig = MatrixXd(n_z, 2 * n_aug_ + 1);
@@ -298,7 +299,7 @@ void UKF::UpdateMeasurement(MeasurementPackage meas_package) {
             // phi
             z_sig(1, i) = atan2(p_y, p_x);
 
-            // rho_dot
+            // rhor (rate of rho)
             z_sig(2, i) = (z_sig(0, i) < 0.0001 ? (p_x * v_x + p_y * v_y) / 0.0001 : (p_x * v_x + p_y * v_y) / z_sig(0, i));
         }
     } else if (meas_package.sensor_type_ == meas_package.LASER) {
